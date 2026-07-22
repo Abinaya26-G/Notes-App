@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: notes-db
+    restart: always
+    environment:
+      POSTGRES_DB: notes_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2603
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: notes-backend
+    restart: always
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    container_name: notes-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
