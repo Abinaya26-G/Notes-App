@@ -4,58 +4,57 @@ pipeline {
 
     stages {
 
-        stage('Clone Code') {
+        stage('Check Workspace') {
             steps {
                 sh '''
-                echo "Cloning code..."
-                checkout scm
+                echo "Current Directory:"
+                pwd
+
+                echo "Project Files:"
+                ls -la
                 '''
             }
         }
 
         stage('Build Backend') {
             steps {
-                sh '''
-                echo "Building Spring Boot Backend..."
-                cd backend
-                mvn clean package -DskipTests
-                cd ..
-                '''
+                dir('backend') {
+                    sh '''
+                    mvn clean package -DskipTests
+                    '''
+                }
             }
         }
 
         stage('Build Frontend') {
             steps {
-                sh '''
-                echo "Building React Frontend..."
-                cd frontend
-                npm install
-                npm run build
-                cd ..
-                '''
+                dir('frontend') {
+                    sh '''
+                    npm install
+                    npm run build
+                    '''
+                }
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Images') {
             steps {
                 sh '''
-                echo "Building Docker images..."
                 docker compose build
                 '''
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Application') {
             steps {
                 sh '''
-                echo "Deploying application..."
                 docker compose down || true
                 docker compose up -d
                 '''
             }
         }
 
-        stage('Check Status') {
+        stage('Verify Deployment') {
             steps {
                 sh '''
                 docker ps
@@ -65,12 +64,14 @@ pipeline {
     }
 
     post {
+
         success {
-            sh 'echo "Deployment Successful"'
+            sh 'echo "Notes App deployed successfully!"'
         }
 
         failure {
-            sh 'echo "Deployment Failed"'
+            sh 'echo "Deployment failed!"'
         }
+
     }
 }
