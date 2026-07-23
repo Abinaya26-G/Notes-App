@@ -2,7 +2,7 @@
 
 ## Tech Stack
 - **Backend:** Java 17, Spring Boot 3.x, Spring Security, JWT, Spring Data JPA, PostgreSQL, Maven, Lombok
-- **Frontend:** React 18, Vite, React Router DOM, Axios, React Toastify, Lucide React Icons, Plain CSS
+- **Frontend:** React 18, Vite, React Router DOM, Axios, React Toastify, Lucide React Icons,
 
 ## Prerequisites
 - Java 17+
