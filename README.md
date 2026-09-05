@@ -1,67 +1,122 @@
-# Notes App - Full Stack Portfolio Project
+# Notes App
 
-## Tech Stack
-- **Backend:** Java 17, Spring Boot 3.x, Spring Security, JWT, Spring Data JPA, PostgreSQL, Maven, Lombok
-- **Frontend:** React 18, Vite, React Router DOM, Axios, React Toastify, Lucide React
+This is a simple Notes App made using Spring Boot and React.
 
-## Prerequisites
-- Java 17+
-- Node.js 18+
-- PostgreSQL (database `notes_db` must exist)
-- Maven
+Users can register and login, create notes, edit them, delete them and manage their notes based on their status.
+
+## Technologies Used
+
+### Backend
+
+* Java 17
+* Spring Boot
+* Spring Security
+* JWT
+* Spring Data JPA
+* PostgreSQL
+* Maven
+* Lombok
+
+### Frontend
+
+* React 18
+* Vite
+* React Router
+* Axios
+* React Toastify
+* Lucide React
+
+### Deployment
+
+* Docker
+* Jenkins
+* GitHub Webhook
+* AWS EC2
+
+## Features
+
+* Register and Login
+* JWT based authentication
+* Create, edit and delete notes
+* Save notes as draft
+* Mark notes as completed
+* Pin and unpin notes
+* Search notes by title and content
+* Filter notes by status
+* Dashboard with note statistics
+* Update profile and password
+* Responsive UI
 
 ## Setup
 
-### 1. PostgreSQL
-Create database (do NOT create tables):
+### Database
+
+Create a PostgreSQL database:
+
 ```sql
 CREATE DATABASE notes_db;
 ```
 
-### 2. Backend
-1. Open `backend/src/main/resources/application.properties`
-2. Replace `YOUR_PASSWORD` with your PostgreSQL password
-3. Run:
+No need to create the tables manually. They will be created automatically when the backend is started.
+
+### Backend
+
+Go to the backend folder:
+
 ```bash
 cd backend
 mvn spring-boot:run
 ```
-Server runs on `http://localhost:9090`
 
-### 3. Frontend
+Before running, update the PostgreSQL username and password in `application.properties`.
+
+Backend runs at:
+
+`http://localhost:9090`
+
+### Frontend
+
+Go to the frontend folder:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Frontend runs on `http://localhost:5173`
 
-## Features
-- JWT Authentication (Register / Login)
-- Create, Edit, Delete, View Notes
-- Save as Draft
-- Mark Pending as Completed
-- Pin / Unpin Notes (pinned notes appear at top)
-- Real-time Search by title and content
-- Tab Filters: All, Draft, Pending, Completed
-- Dashboard Stats Cards (auto-update)
-- Profile Page with Edit Name / Password
-- Responsive Minimal UI
+Frontend runs at:
 
-## API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/auth/register | Register |
-| POST | /api/auth/login | Login |
-| GET | /api/auth/me | Current User |
-| GET | /api/notes | All Notes |
-| GET | /api/notes/{id} | Get Note |
-| POST | /api/notes | Create Note (Pending) |
-| POST | /api/notes/draft | Save Draft |
-| PUT | /api/notes/{id} | Update Note |
-| PATCH | /api/notes/{id}/pin | Toggle Pin |
-| PATCH | /api/notes/{id}/complete | Mark Complete |
-| DELETE | /api/notes/{id} | Delete Note |
-| GET | /api/notes/stats | Statistics |
-| GET | /api/profile | Get Profile |
-| PUT | /api/profile | Update Profile |
+`http://localhost:5173`
+
+## API
+
+| Method | Endpoint                   | Description         |
+| ------ | -------------------------- | ------------------- |
+| POST   | `/api/auth/register`       | Register user       |
+| POST   | `/api/auth/login`          | Login               |
+| GET    | `/api/auth/me`             | Get current user    |
+| GET    | `/api/notes`               | Get notes           |
+| GET    | `/api/notes/{id}`          | Get note            |
+| POST   | `/api/notes`               | Create note         |
+| POST   | `/api/notes/draft`         | Save draft          |
+| PUT    | `/api/notes/{id}`          | Update note         |
+| PATCH  | `/api/notes/{id}/pin`      | Pin / Unpin         |
+| PATCH  | `/api/notes/{id}/complete` | Complete note       |
+| DELETE | `/api/notes/{id}`          | Delete note         |
+| GET    | `/api/notes/stats`         | Get note statistics |
+| GET    | `/api/profile`             | Get profile         |
+| PUT    | `/api/profile`             | Update profile      |
+
+## Deployment
+
+The application is deployed using Docker, Jenkins and AWS EC2.
+
+GitHub Webhook is connected with Jenkins, so whenever new code is pushed to GitHub, Jenkins automatically starts the build and deployment process.
+
+### Deployment Flow
+
+GitHub → Webhook → Jenkins → Docker → AWS EC2
+
+## Author
+
+Abinaya
