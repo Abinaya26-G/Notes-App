@@ -1,7 +1,4 @@
-version: "3.8"
-
 services:
-
   postgres:
     image: postgres:16
     container_name: notes-db
@@ -9,26 +6,29 @@ services:
     environment:
       POSTGRES_DB: notes_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2603
-    ports:
-      - "5433:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d notes_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
     container_name: notes-backend
     restart: always
-    ports:
-      - "9090:9090"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/notes_db
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 2603
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
-      - postgres
-
+      postgres:
+        condition: service_healthy
+    expose:
+      - "9090"
 
   frontend:
     build: ./frontend
@@ -38,7 +38,6 @@ services:
       - "80:80"
     depends_on:
       - backend
-
 
 volumes:
   postgres_data:
