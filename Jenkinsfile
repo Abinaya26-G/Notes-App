@@ -1,46 +1,44 @@
 pipeline {
-
     agent any
 
-    stages {
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+    }
 
-        stage('Check Workspace') {
+    environment {
+        COMPOSE_FILE = 'docker-compose.yml'
+        ENV_FILE = '/home/ubuntu/notesapp.env'
+        COMPOSE_PARALLEL_LIMIT = '1'
+    }
+
+    stages {
+        stage('Check Docker') {
             steps {
                 sh '''
-                echo "Current Directory:"
-                pwd
-
-                echo "Project Files:"
-                ls -la
+                    docker --version
+                    docker compose version
+                    docker ps
                 '''
             }
         }
 
-        stage('Build Backend') {
-            steps {
-                dir('backend') {
-                    sh '''
-                    mvn clean package -DskipTests
-                    '''
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir('frontend') {
-                    sh '''
-                    npm install
-                    npm run build
-                    '''
-                }
-            }
-        }
-
-        stage('Build Docker Images') {
+        stage('Validate Configuration') {
             steps {
                 sh '''
-                docker compose build
+                    docker compose \
+                    --env-file "$ENV_FILE" \
+                    -f "$COMPOSE_FILE" config -q
+                '''
+            }
+        }
+
+        stage('Build Images') {
+            steps {
+                sh '''
+                    docker compose \
+                    --env-file "$ENV_FILE" \
+                    -f "$COMPOSE_FILE" build
                 '''
             }
         }
@@ -48,8 +46,10 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh '''
-                docker compose down || true
-                docker compose up -d --build
+                    docker compose \
+                    --env-file "$ENV_FILE" \
+                    -f "$COMPOSE_FILE" \
+                    up -d --remove-orphans
                 '''
             }
         }
@@ -57,21 +57,31 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                docker ps
+                    docker compose \
+                    --env-file "$ENV_FILE" \
+                    -f "$COMPOSE_FILE" ps
+
+                    for i in $(seq 1 30); do
+                        if curl -fsS http://localhost/ > /dev/null; then
+                            echo "Frontend is responding!"
+                            exit 0
+                        fi
+                        sleep 5
+                    done
+
+                    echo "Frontend health check failed"
+                    exit 1
                 '''
             }
         }
     }
 
     post {
-
         success {
-            sh 'echo "Notes App deployed successfully!"'
+            echo 'Notes App deployment successful!'
         }
-
         failure {
-            sh 'echo "Deployment failed!"'
+            echo 'Deployment failed. Check Jenkins console output.'
         }
-
     }
 }
